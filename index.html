@@ -1,193 +1,181 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Untukmu</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Poppins:wght@300&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You</title>
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #eaeaea;
-      overflow: hidden;
-    }
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
 
-    body::before {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee') no-repeat center/cover;
-      filter: blur(12px) brightness(0.35) grayscale(60%);
-      z-index: -2;
-    }
+body {
+  height: 100vh;
+  background: url('bg.jpg') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  overflow: hidden;
+}
 
-    body::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: -1;
-    }
+/* overlay cinematic */
+body::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
+}
 
-    .card {
-      max-width: 720px;
-      padding: 45px;
-      border-radius: 22px;
-      backdrop-filter: blur(16px);
-      background: rgba(255,255,255,0.04);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-      animation: fadeIn 3s ease;
-      overflow-y: auto;
-      max-height: 85vh;
-    }
+/* container */
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 90%;
+  text-align: center;
+}
 
-    h1 {
-      font-family: 'Playfair Display', serif;
-      text-align: center;
-      margin-bottom: 35px;
-      font-size: 36px;
-      letter-spacing: 2px;
-      opacity: 0.85;
-    }
+/* typing text */
+#text {
+  font-size: 18px;
+  line-height: 1.8;
+  white-space: pre-line;
+  border-right: 2px solid white;
+  display: inline-block;
+  padding-right: 5px;
+  animation: blink 1s infinite;
+}
 
-    p {
-      margin-bottom: 22px;
-      line-height: 2;
-      text-align: justify;
-      opacity: 0;
-      transform: translateY(25px);
-      animation: fadeText 2s ease forwards;
-    }
+@keyframes blink {
+  50% { border-color: transparent; }
+}
 
-    p:nth-child(2) { animation-delay: 2s; }
-    p:nth-child(3) { animation-delay: 5s; }
+/* button */
+button {
+  margin-top: 25px;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.9);
+  color: black;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    .closing {
-      margin-top: 30px;
-      text-align: center;
-      font-style: italic;
-      opacity: 0;
-      animation: fadeText 3s ease forwards;
-      animation-delay: 8s;
-    }
+button:hover {
+  background: pink;
+}
 
-    .footer {
-      margin-top: 40px;
-      text-align: right;
-      font-size: 14px;
-      opacity: 0;
-      animation: fadeText 3s ease forwards;
-      animation-delay: 12s;
-    }
+/* fade in */
+.fade {
+  animation: fadeIn 2s ease forwards;
+}
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-    @keyframes fadeText {
-      to { opacity: 1; transform: translateY(0); }
-    }
+/* floating hearts */
+.heart {
+  position: absolute;
+  color: pink;
+  animation: float 6s linear infinite;
+}
 
-    /* efek hujan realistis */
-    .rain {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background-image: url('https://i.ibb.co/7QpKsCX/rain.gif');
-      opacity: 0.15;
-      z-index: 0;
-    }
+@keyframes float {
+  from { transform: translateY(100vh); opacity: 1; }
+  to { transform: translateY(-10vh); opacity: 0; }
+}
+</style>
 
-    .music-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(255,255,255,0.08);
-      border: none;
-      padding: 12px 18px;
-      border-radius: 50px;
-      color: #ccc;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      font-size: 13px;
-    }
-
-  </style>
 </head>
 <body>
 
-  <div class="rain"></div>
+<div class="container fade">
+  <div id="text"></div>
+  <br>
+  <button onclick="start()">Mulai</button>
+</div>
 
-  <div class="card">
-    <h1>Untukmu</h1>
+<!-- AUDIO -->
+<audio id="music" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
 
-    <p>
-      aku harap kita asing untuk saling memperbaiki diri. jika waktunya tiba aku harap ada kesempatan buat bersama,
-      aku hargai keputusan kamu walau aku tau sebab pastinya. setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku.
-      senang mengenalmu, senang pernah dilibatkan bahkan dalam hal kecil di hidup kamu.
-    </p>
+<script>
+const message = `aku harap kita asing untuk saling memperbaiki diri.
+jika waktunya tiba aku harap ada kesempatan buat bersama,
+aku hargai keputusan kamu walau aku tau sebab pastinya
+setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku,
 
-    <p>
-      aku bakal berhenti di hari ketiga ini, bukan karena semuanya selesai… tapi karena aku lelah berkelahi sama isi pikiranku sendiri.
-      kisah ini mungkin terlihat lucu, tapi entah kenapa cukup membekas.
-      dan kalau suatu saat ketidaksengajaan yang memperkenalkan kita terulang lagi,
-      aku masih akan sangat senang… bahkan aku tetap siap menerima kamu, dengan segala kondisi kamu.
-    </p>
+senang mengenal mu
+senang pernah dilibatkan dalam hal kecil dihidup kamu,
 
-    <p class="closing">
-      sesibuk apapun kamu, jangan lupa sama kesehatan kamu ya.
-      karena rezeki yang gak pernah putus itu kesehatan.
-      kamu lagi survive sendirian… kalau sampai sakit, itu cuma bakal memperburuk keadaan.
-      dan satu lagi… jangan pernah berhenti jadi orang baik.
-    </p>
+aku bakal berhenti di hari ketiga ini
+karena aku lelah berkelahi sama isi pikiranku,
 
-    <div class="footer">
-      Thank you for everything.<br><br>
-      From Fadlian,<br>
-      March 18, 2026
-    </div>
-  </div>
+kisah ini lucu tapi ya cukup membekas,
 
-  <!-- Musik sedih + hujan -->
-  <audio id="bg-music" loop>
-    <source src="https://cdn.pixabay.com/download/audio/2023/03/28/audio_6f4a2c1b58.mp3" type="audio/mpeg">
-  </audio>
+jika ketidaksengajaan yang memperkenalkan kita terjadi lagi
+aku masih dan akan sangat senang
+bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.
 
-  <button class="music-btn" onclick="toggleMusic()">🎧 Play</button>
+sesibuk apapun jangan lupa sama kesehatan kamu ya
+karena rezeki yang gak pernah putus diberikan itu kesehatan,
 
-  <script>
-    const music = document.getElementById("bg-music");
-    const btn = document.querySelector(".music-btn");
+kamu sedang survive sendirian
+kalau sampai sakit itu memperburuk keadaan,
 
-    function toggleMusic() {
-      if (music.paused) {
-        music.play();
-        btn.innerText = "⏸ Pause";
-      } else {
-        music.pause();
-        btn.innerText = "🎧 Play";
-      }
-    }
+jangan pernah berhenti jadi orang baik
+walau sebatas niat ataupun sudah tereksekusi.
 
-    // autoplay pelan setelah interaksi
-    document.body.addEventListener('click', () => {
-      if (music.paused) {
-        music.play().catch(()=>{});
-        btn.innerText = "⏸ Pause";
-      }
-    }, { once: true });
-  </script>
+Thank you for everything.
+
+From Fadlian, March 18, 2026`;
+
+let i = 0;
+
+function typeWriter() {
+  if (i < message.length) {
+    document.getElementById("text").innerHTML += message.charAt(i);
+    i++;
+    setTimeout(typeWriter, 35);
+  }
+}
+
+function start() {
+  // play music
+  const music = document.getElementById("music");
+  music.volume = 0.4;
+  music.play();
+
+  // start typing
+  document.getElementById("text").innerHTML = "";
+  i = 0;
+  typeWriter();
+}
+
+/* hearts animation */
+setInterval(() => {
+  let heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "❤";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (Math.random() * 20 + 10) + "px";
+  document.body.appendChild(heart);
+
+  setTimeout(() => {
+    heart.remove();
+  }, 6000);
+}, 400);
+</script>
 
 </body>
 </html>
-
