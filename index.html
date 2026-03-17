@@ -10,89 +10,102 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Georgia', serif;
 }
 
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: white;
+}
+
+/* BACKGROUND */
 .bg {
   position: fixed;
   width: 100%;
   height: 100%;
   background: url('bg.jpg') center/cover no-repeat;
-  filter: blur(10px);
+  filter: blur(10px) brightness(0.6);
   transform: scale(1.1);
   animation: zoom 25s ease-in-out infinite alternate;
   z-index: 0;
-  pointer-events: none; /* biar gak nutup klik */
+  pointer-events: none;
 }
 
 @keyframes zoom {
   from { transform: scale(1.1); }
-  to { transform: scale(1.25); }
+  to { transform: scale(1.2); }
 }
 
+/* OVERLAY */
 .overlay {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.5);
   z-index: 1;
-  pointer-events: none; /* INI KUNCINYA */
+  pointer-events: none;
 }
 
-.container {
+/* CONTENT */
+.content {
   position: relative;
   z-index: 2;
-  max-width: 700px;
-  width: 90%;
-  max-height: 85vh;
-  overflow-y: auto;
-  margin: auto;
-  color: white;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   padding: 20px;
 }
 
-#text {
-  font-size: 16px;
-  line-height: 2;
-  white-space: pre-line;
+.text {
+  max-width: 700px;
+  font-size: 18px;
+  line-height: 1.8;
   opacity: 0;
-  transition: 1s;
+  transition: all 1.5s ease;
 }
 
+/* BUTTON */
 button {
-  margin-top: 25px;
-  padding: 12px 28px;
+  position: absolute;
+  z-index: 3;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 15px 30px;
+  border-radius: 30px;
   border: none;
-  border-radius: 25px;
+  font-size: 16px;
   background: white;
   color: black;
   cursor: pointer;
 }
 
+/* FADE */
 .fade-in {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 #ending {
-  margin-top: 40px;
-  font-size: 18px;
+  font-style: italic;
+  margin-top: 20px;
   opacity: 0;
   transition: 2s;
 }
 
-/* BLACKOUT EFFECT */
-.blackout {
+#blackout {
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   background: black;
   opacity: 0;
-  z-index: 999;
+  z-index: 5;
   transition: 4s;
 }
+
 </style>
 </head>
 
@@ -100,70 +113,44 @@ button {
 
 <div class="bg"></div>
 <div class="overlay"></div>
-<div class="blackout" id="blackout"></div>
 
-<div class="container">
-  <div id="text"></div>
-  <button onclick="start()">Klik pelan ya...</button>
+<div class="content">
+  <div class="text" id="text"></div>
   <div id="ending"></div>
 </div>
+
+<button onclick="start()" ontouchstart="start()">Klik pelan ya...</button>
 
 <audio id="music" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
+<div id="blackout"></div>
+
 <script>
+const textEl = document.getElementById("text");
+const endingEl = document.getElementById("ending");
+
 const paragraphs = [
-`aku harap kita asing untuk saling memperbaiki diri.`,
-
-`jika waktunya tiba
-aku harap ada kesempatan buat bersama...`,
-
-`aku hargai keputusan kamu
-walau aku tau sebab pastinya`,
-
-`setidaknya...
-kamu pernah jadi warna
-di antara hitam putih perjalanan hidupku.`,
-
-`senang mengenal mu
-senang pernah dilibatkan
-dalam hal kecil dihidup kamu.`,
-
-`aku bakal berhenti di hari ketiga ini...
-karena aku lelah
-berkelahi sama isi pikiranku.`,
-
-`kisah ini lucu...
-tapi ya cukup membekas.`,
-
-`jika ketidaksengajaan itu terjadi lagi,
-aku masih akan sangat senang...`,
-
-`bahkan aku siap menerima kamu
-dengan segala kondisi kamu.`,
-
-`sesibuk apapun kamu...
-jangan lupa kesehatan ya.`,
-
-`karena rezeki yang gak pernah putus itu...
-adalah sehat.`,
-
-`kamu lagi berjuang sendirian sekarang...`,
-
-`kalau kamu sakit...
-itu cuma akan memperberat semuanya.`,
-
-`jadi tolong...
-jaga diri kamu baik-baik.`,
-
-`dan jangan pernah berhenti jadi orang baik...`
+"Aku harap kita bisa jadi asing... untuk saling memperbaiki diri.",
+"Kalau waktunya tiba, aku harap masih ada kesempatan untuk kita kembali... bukan sebagai yang dulu, tapi sebagai dua orang yang sudah belajar dari luka masing-masing.",
+"Aku menghargai keputusan kamu... walaupun aku tahu, pasti ada alasan yang tidak pernah benar-benar kamu ceritakan.",
+"Setidaknya... kamu pernah jadi warna di antara hitam putih perjalanan hidupku.",
+"Aku senang pernah mengenalmu... bahkan untuk hal-hal kecil yang mungkin buatmu biasa saja, tapi buatku itu berarti.",
+"Aku berhenti di hari ketiga ini... bukan karena aku sudah tidak peduli, tapi karena aku lelah berperang dengan pikiranku sendiri.",
+"Kisah ini lucu ya... singkat, tapi cukup membekas sampai aku pun sulit menjelaskannya.",
+"Kalau suatu hari ketidaksengajaan itu terjadi lagi... aku masih akan senang.",
+"Bahkan aku akan tetap menerima kamu... dengan segala keadaanmu, tanpa banyak tanya."
 ];
 
-let textEl = document.getElementById("text");
-let endingEl = document.getElementById("ending");
+let started = false;
 
 async function start() {
+  if (started) return;
+  started = true;
+
+  document.querySelector("button").style.display = "none";
+
   const music = document.getElementById("music");
   music.volume = 0;
   music.play();
@@ -178,7 +165,7 @@ async function start() {
     }
   }, 200);
 
-  document.querySelector(".bg").style.filter = "blur(3px)";
+  document.querySelector(".bg").style.filter = "blur(3px) brightness(0.7)";
 
   for (let p of paragraphs) {
     textEl.innerHTML = p;
@@ -190,25 +177,32 @@ async function start() {
     await new Promise(r => setTimeout(r, 1000));
   }
 
-  // ENDING MUNCUL
+  textEl.innerHTML = "Sesibuk apapun kamu... jangan lupa jaga kesehatan ya.<br><br>Karena di dunia ini, yang paling sering kita anggap biasa... justru yang paling berharga.";
+
+  textEl.classList.add("fade-in");
+
+  await new Promise(r => setTimeout(r, 5000));
+
+  textEl.classList.remove("fade-in");
+
+  await new Promise(r => setTimeout(r, 2000));
+
   endingEl.innerHTML = `
   Thank you for everything.<br><br>
   From Fadlian,<br>
   March 18, 2026
   `;
+
   endingEl.style.opacity = 1;
 
-  await new Promise(r => setTimeout(r, 4000));
+  await new Promise(r => setTimeout(r, 5000));
 
-  // ENDING HILANG (INI YANG SAKIT 💀)
   endingEl.style.opacity = 0;
 
   await new Promise(r => setTimeout(r, 3000));
 
-  // BLACKOUT
   document.getElementById("blackout").style.opacity = 1;
 
-  // MUSIC FADE OUT
   let fadeOut = setInterval(() => {
     if (music.volume > 0.02) {
       music.volume -= 0.01;
