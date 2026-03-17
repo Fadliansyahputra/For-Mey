@@ -13,168 +13,208 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-body {
-  height: 100vh;
-  background: url('bg.jpg') no-repeat center center/cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  overflow: hidden;
-}
-
-/* overlay cinematic */
-body::before {
-  content: "";
-  position: absolute;
+.bg {
+  position: fixed;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
+  background: url('bg.jpg') center/cover no-repeat;
+  filter: blur(10px);
+  transform: scale(1.1);
+  animation: zoom 25s ease-in-out infinite alternate;
+  z-index: 0;
 }
 
-/* container */
+@keyframes zoom {
+  from { transform: scale(1.1); }
+  to { transform: scale(1.25); }
+}
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1;
+}
+
 .container {
   position: relative;
   z-index: 2;
-  max-width: 90%;
+  max-width: 700px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  margin: auto;
+  color: white;
   text-align: center;
+  padding: 20px;
 }
 
-/* typing text */
 #text {
-  font-size: 18px;
-  line-height: 1.8;
+  font-size: 16px;
+  line-height: 2;
   white-space: pre-line;
-  border-right: 2px solid white;
-  display: inline-block;
-  padding-right: 5px;
-  animation: blink 1s infinite;
+  opacity: 0;
+  transition: 1s;
 }
 
-@keyframes blink {
-  50% { border-color: transparent; }
-}
-
-/* button */
 button {
   margin-top: 25px;
-  padding: 10px 25px;
+  padding: 12px 28px;
   border: none;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.9);
+  border-radius: 25px;
+  background: white;
   color: black;
-  font-size: 14px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-button:hover {
-  background: pink;
+.fade-in {
+  opacity: 1 !important;
 }
 
-/* fade in */
-.fade {
-  animation: fadeIn 2s ease forwards;
+#ending {
+  margin-top: 40px;
+  font-size: 18px;
+  opacity: 0;
+  transition: 2s;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* floating hearts */
-.heart {
-  position: absolute;
-  color: pink;
-  animation: float 6s linear infinite;
-}
-
-@keyframes float {
-  from { transform: translateY(100vh); opacity: 1; }
-  to { transform: translateY(-10vh); opacity: 0; }
+/* BLACKOUT EFFECT */
+.blackout {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0;
+  z-index: 999;
+  transition: 4s;
 }
 </style>
-
 </head>
+
 <body>
 
-<div class="container fade">
+<div class="bg"></div>
+<div class="overlay"></div>
+<div class="blackout" id="blackout"></div>
+
+<div class="container">
   <div id="text"></div>
-  <br>
-  <button onclick="start()">Mulai</button>
+  <button onclick="start()">Klik pelan ya...</button>
+  <div id="ending"></div>
 </div>
 
-<!-- AUDIO -->
 <audio id="music" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-const message = `aku harap kita asing untuk saling memperbaiki diri.
-jika waktunya tiba aku harap ada kesempatan buat bersama,
-aku hargai keputusan kamu walau aku tau sebab pastinya
-setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku,
+const paragraphs = [
+`aku harap kita asing untuk saling memperbaiki diri.`,
 
-senang mengenal mu
-senang pernah dilibatkan dalam hal kecil dihidup kamu,
+`jika waktunya tiba
+aku harap ada kesempatan buat bersama...`,
 
-aku bakal berhenti di hari ketiga ini
-karena aku lelah berkelahi sama isi pikiranku,
+`aku hargai keputusan kamu
+walau aku tau sebab pastinya`,
 
-kisah ini lucu tapi ya cukup membekas,
+`setidaknya...
+kamu pernah jadi warna
+di antara hitam putih perjalanan hidupku.`,
 
-jika ketidaksengajaan yang memperkenalkan kita terjadi lagi
-aku masih dan akan sangat senang
-bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.
+`senang mengenal mu
+senang pernah dilibatkan
+dalam hal kecil dihidup kamu.`,
 
-sesibuk apapun jangan lupa sama kesehatan kamu ya
-karena rezeki yang gak pernah putus diberikan itu kesehatan,
+`aku bakal berhenti di hari ketiga ini...
+karena aku lelah
+berkelahi sama isi pikiranku.`,
 
-kamu sedang survive sendirian
-kalau sampai sakit itu memperburuk keadaan,
+`kisah ini lucu...
+tapi ya cukup membekas.`,
 
-jangan pernah berhenti jadi orang baik
-walau sebatas niat ataupun sudah tereksekusi.
+`jika ketidaksengajaan itu terjadi lagi,
+aku masih akan sangat senang...`,
 
-Thank you for everything.
+`bahkan aku siap menerima kamu
+dengan segala kondisi kamu.`,
 
-From Fadlian, March 18, 2026`;
+`sesibuk apapun kamu...
+jangan lupa kesehatan ya.`,
 
-let i = 0;
+`karena rezeki yang gak pernah putus itu...
+adalah sehat.`,
 
-function typeWriter() {
-  if (i < message.length) {
-    document.getElementById("text").innerHTML += message.charAt(i);
-    i++;
-    setTimeout(typeWriter, 35);
-  }
-}
+`kamu lagi berjuang sendirian sekarang...`,
 
-function start() {
-  // play music
+`kalau kamu sakit...
+itu cuma akan memperberat semuanya.`,
+
+`jadi tolong...
+jaga diri kamu baik-baik.`,
+
+`dan jangan pernah berhenti jadi orang baik...`
+];
+
+let textEl = document.getElementById("text");
+let endingEl = document.getElementById("ending");
+
+async function start() {
   const music = document.getElementById("music");
-  music.volume = 0.4;
+  music.volume = 0;
   music.play();
 
-  // start typing
-  document.getElementById("text").innerHTML = "";
-  i = 0;
-  typeWriter();
+  let vol = 0;
+  let fade = setInterval(() => {
+    if (vol < 0.4) {
+      vol += 0.02;
+      music.volume = vol;
+    } else {
+      clearInterval(fade);
+    }
+  }, 200);
+
+  document.querySelector(".bg").style.filter = "blur(3px)";
+
+  for (let p of paragraphs) {
+    textEl.innerHTML = p;
+    textEl.classList.add("fade-in");
+
+    await new Promise(r => setTimeout(r, 4000));
+
+    textEl.classList.remove("fade-in");
+    await new Promise(r => setTimeout(r, 1000));
+  }
+
+  // ENDING MUNCUL
+  endingEl.innerHTML = `
+  Thank you for everything.<br><br>
+  From Fadlian,<br>
+  March 18, 2026
+  `;
+  endingEl.style.opacity = 1;
+
+  await new Promise(r => setTimeout(r, 4000));
+
+  // ENDING HILANG (INI YANG SAKIT 💀)
+  endingEl.style.opacity = 0;
+
+  await new Promise(r => setTimeout(r, 3000));
+
+  // BLACKOUT
+  document.getElementById("blackout").style.opacity = 1;
+
+  // MUSIC FADE OUT
+  let fadeOut = setInterval(() => {
+    if (music.volume > 0.02) {
+      music.volume -= 0.01;
+    } else {
+      clearInterval(fadeOut);
+    }
+  }, 200);
 }
-
-/* hearts animation */
-setInterval(() => {
-  let heart = document.createElement("div");
-  heart.className = "heart";
-  heart.innerHTML = "❤";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = (Math.random() * 20 + 10) + "px";
-  document.body.appendChild(heart);
-
-  setTimeout(() => {
-    heart.remove();
-  }, 6000);
-}, 400);
 </script>
 
 </body>
