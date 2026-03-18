@@ -6,118 +6,107 @@
 <title>For You</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Georgia', serif;
+* {margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body,html{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:black;
+  color:white;
 }
 
-body, html {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  color: white;
+/* BG */
+.bg{
+  position:fixed;
+  width:100%;height:100%;
+  background:url('bg.jpg') center/cover no-repeat;
+  filter:blur(10px) brightness(0.5);
+  z-index:0;
 }
 
-/* BACKGROUND */
-.bg {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: url('bg.jpg') center/cover no-repeat;
-  filter: blur(12px) brightness(0.5);
-  transform: scale(1.1);
-  animation: zoom 25s ease-in-out infinite alternate;
-  z-index: 0;
-}
-
-@keyframes zoom {
-  from { transform: scale(1.1); }
-  to { transform: scale(1.2); }
-}
-
-/* HUJAN */
-.rain {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-image: url('https://i.ibb.co/7QpKsCX/rain.gif');
-  opacity: 0.15;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* OVERLAY */
-.overlay {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  z-index: 2;
+/* Overlay */
+.overlay{
+  position:fixed;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:1;
 }
 
 /* CONTENT */
-.content {
-  position: relative;
-  z-index: 3;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
+.content{
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100%;
+  text-align:center;
+  padding:20px;
 }
 
-.text {
-  max-width: 700px;
-  font-size: 18px;
-  line-height: 1.8;
-  min-height: 120px;
+.text{
+  max-width:600px;
+  font-size:18px;
+  line-height:1.8;
 }
 
 /* BUTTON */
-button {
-  position: absolute;
-  z-index: 5;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 15px 30px;
-  border-radius: 30px;
-  border: none;
-  font-size: 16px;
-  background: white;
-  color: black;
+button{
+  position:absolute;
+  top:45%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  padding:15px 30px;
+  border:none;
+  border-radius:30px;
+  background:white;
+  color:black;
+  z-index:5;
 }
 
-/* ENDING */
-#ending {
-  opacity: 0;
-  transition: 3s;
-  font-style: italic;
+/* CHAT */
+.chat{
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  padding:15px;
+  display:none;
+}
+
+.bubble{
+  max-width:70%;
+  padding:10px 14px;
+  border-radius:10px;
+  margin:8px;
+  font-size:14px;
+}
+
+.me{
+  background:#DCF8C6;
+  color:black;
+  margin-left:auto;
+}
+
+.status{
+  font-size:10px;
+  opacity:0.6;
+  margin-top:2px;
+}
+
+.typing{
+  font-size:12px;
+  opacity:0.7;
+  margin-left:10px;
 }
 
 /* BLACKOUT */
-#blackout {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: black;
-  opacity: 0;
-  z-index: 10;
-  transition: 6s;
-}
-
-/* GLITCH */
-.glitch {
-  animation: glitch 0.3s;
-}
-
-@keyframes glitch {
-  0% { transform: translate(1px, -1px); }
-  50% { transform: translate(-1px, 1px); }
-  100% { transform: translate(0); }
+#blackout{
+  position:fixed;
+  width:100%;height:100%;
+  background:black;
+  opacity:0;
+  z-index:10;
+  transition:4s;
 }
 
 </style>
@@ -126,17 +115,17 @@ button {
 <body>
 
 <div class="bg"></div>
-<div class="rain"></div>
 <div class="overlay"></div>
 
 <div class="content">
   <div class="text" id="text"></div>
-  <div id="ending"></div>
 </div>
 
 <button onclick="start()" ontouchstart="start()">Klik pelan ya...</button>
 
-<audio id="music" loop>
+<div class="chat" id="chat"></div>
+
+<audio id="music" loop preload="auto">
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
@@ -144,105 +133,101 @@ button {
 
 <script>
 const textEl = document.getElementById("text");
-const endingEl = document.getElementById("ending");
+const chatEl = document.getElementById("chat");
 
-const paragraphs = [
-"Aku harap kita bisa jadi asing... untuk saling memperbaiki diri.",
-"Kalau waktunya tiba, aku harap masih ada kesempatan untuk kita kembali...",
-"Aku menghargai keputusan kamu... walaupun aku tahu, ada hal yang tidak pernah kamu ceritakan.",
-"Kamu pernah jadi warna... di antara hitam putih hidupku.",
-"Aku senang pernah mengenalmu...",
-"Aku berhenti... bukan karena aku sudah tidak peduli.",
-"Tapi karena aku lelah... melawan pikiranku sendiri.",
-"Kisah ini singkat... tapi cukup membekas.",
-"Kalau kita dipertemukan lagi secara tidak sengaja...",
-"Aku masih akan memilih kamu."
-];
+let started=false;
 
-let started = false;
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+async function start(){
+  if(started) return;
+  started=true;
 
-async function typeText(text) {
-  textEl.innerHTML = "";
-  for (let i = 0; i < text.length; i++) {
-    textEl.innerHTML += text[i];
+  document.querySelector("button").style.display="none";
 
-    // glitch random
-    if (Math.random() < 0.05) {
-      textEl.classList.add("glitch");
-      setTimeout(() => textEl.classList.remove("glitch"), 100);
-    }
-
-    await sleep(40);
-  }
-}
-
-async function start() {
-  if (started) return;
-  started = true;
-
-  document.querySelector("button").style.display = "none";
-
-  const music = document.getElementById("music");
-  music.volume = 0;
-  music.play();
-
-  // fade in music
-  let vol = 0;
-  let fade = setInterval(() => {
-    if (vol < 0.4) {
-      vol += 0.01;
-      music.volume = vol;
-    } else clearInterval(fade);
-  }, 200);
-
-  // background clear pelan
-  let blur = 12;
-  let blurAnim = setInterval(() => {
-    if (blur > 3) {
-      blur -= 0.2;
-      document.querySelector(".bg").style.filter = `blur(${blur}px) brightness(0.6)`;
-    } else clearInterval(blurAnim);
-  }, 200);
-
-  for (let p of paragraphs) {
-    await typeText(p);
-    await sleep(2500);
-    textEl.innerHTML = "";
+  const music=document.getElementById("music");
+  try{
+    await music.play();
+  }catch(e){
+    console.log("Autoplay blocked, retry...");
   }
 
-  await typeText("Sesibuk apapun kamu... jangan lupa jaga kesehatan ya.");
+  music.volume=0;
 
-  await sleep(3000);
+  let vol=0;
+  let fade=setInterval(()=>{
+    if(vol<0.4){
+      vol+=0.02;
+      music.volume=vol;
+    }else clearInterval(fade);
+  },200);
 
-  textEl.innerHTML = "";
+  // TEKS AWAL
+  const intro=[
+    "Aku harap kita bisa jadi asing...",
+    "Bukan karena kita gagal...",
+    "Tapi karena kita butuh waktu memperbaiki diri masing-masing..."
+  ];
 
+  for(let t of intro){
+    textEl.innerHTML=t;
+    await sleep(3000);
+  }
+
+  textEl.innerHTML="";
   await sleep(1000);
 
-  endingEl.innerHTML = `
-  Thank you for everything.<br><br>
-  From Fadlian,<br>
-  March 18, 2026
-  `;
-  endingEl.style.opacity = 1;
+  // MASUK CHAT MODE
+  chatEl.style.display="block";
 
-  await sleep(6000);
+  async function send(msg){
+    let div=document.createElement("div");
+    div.className="bubble me";
+    div.innerHTML=msg + "<div class='status'>✓✓</div>";
+    chatEl.appendChild(div);
+    chatEl.scrollTop=chatEl.scrollHeight;
+    await sleep(2000);
+  }
 
-  endingEl.style.opacity = 0;
+  async function typing(){
+    let t=document.createElement("div");
+    t.className="typing";
+    t.innerText="typing...";
+    chatEl.appendChild(t);
+    await sleep(3000);
+    t.remove();
+  }
+
+  await send("Kamu masih inget aku?");
+  await send("Atau aku cuma fase?");
+  await send("Gapapa sih kalau iya...");
+  
+  await typing();
+
+  await send("Aku cuma pengen jujur sekali ini aja...");
+  await send("Aku masih mikirin kamu.");
+
+  await typing();
+
+  await send("Tapi aku juga sadar...");
+  await send("Gak semua yang kita mau harus kita miliki 🙂");
 
   await sleep(3000);
 
-  document.getElementById("blackout").style.opacity = 1;
+  // LAST HIT
+  await send("Jadi... aku mundur ya.");
 
-  // fade out music
-  let fadeOut = setInterval(() => {
-    if (music.volume > 0.02) {
-      music.volume -= 0.01;
-    } else clearInterval(fadeOut);
-  }, 200);
+  await sleep(4000);
+
+  // BLACKOUT
+  document.getElementById("blackout").style.opacity=1;
+
+  // fade music
+  let fadeOut=setInterval(()=>{
+    if(music.volume>0.02){
+      music.volume-=0.01;
+    }else clearInterval(fadeOut);
+  },200);
 }
 </script>
 
