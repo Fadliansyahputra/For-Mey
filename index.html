@@ -26,11 +26,10 @@ body, html {
   width: 100%;
   height: 100%;
   background: url('bg.jpg') center/cover no-repeat;
-  filter: blur(10px) brightness(0.6);
+  filter: blur(12px) brightness(0.5);
   transform: scale(1.1);
   animation: zoom 25s ease-in-out infinite alternate;
   z-index: 0;
-  pointer-events: none;
 }
 
 @keyframes zoom {
@@ -38,20 +37,30 @@ body, html {
   to { transform: scale(1.2); }
 }
 
+/* HUJAN */
+.rain {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://i.ibb.co/7QpKsCX/rain.gif');
+  opacity: 0.15;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* OVERLAY */
 .overlay {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 1;
-  pointer-events: none;
+  background: rgba(0,0,0,0.6);
+  z-index: 2;
 }
 
 /* CONTENT */
 .content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -64,14 +73,13 @@ body, html {
   max-width: 700px;
   font-size: 18px;
   line-height: 1.8;
-  opacity: 0;
-  transition: all 1.5s ease;
+  min-height: 120px;
 }
 
 /* BUTTON */
 button {
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -81,29 +89,35 @@ button {
   font-size: 16px;
   background: white;
   color: black;
-  cursor: pointer;
 }
 
-/* FADE */
-.fade-in {
-  opacity: 1;
-}
-
+/* ENDING */
 #ending {
-  font-style: italic;
-  margin-top: 20px;
   opacity: 0;
-  transition: 2s;
+  transition: 3s;
+  font-style: italic;
 }
 
+/* BLACKOUT */
 #blackout {
   position: fixed;
   width: 100%;
   height: 100%;
   background: black;
   opacity: 0;
-  z-index: 5;
-  transition: 4s;
+  z-index: 10;
+  transition: 6s;
+}
+
+/* GLITCH */
+.glitch {
+  animation: glitch 0.3s;
+}
+
+@keyframes glitch {
+  0% { transform: translate(1px, -1px); }
+  50% { transform: translate(-1px, 1px); }
+  100% { transform: translate(0); }
 }
 
 </style>
@@ -112,6 +126,7 @@ button {
 <body>
 
 <div class="bg"></div>
+<div class="rain"></div>
 <div class="overlay"></div>
 
 <div class="content">
@@ -133,17 +148,37 @@ const endingEl = document.getElementById("ending");
 
 const paragraphs = [
 "Aku harap kita bisa jadi asing... untuk saling memperbaiki diri.",
-"Kalau waktunya tiba, aku harap masih ada kesempatan untuk kita kembali... bukan sebagai yang dulu, tapi sebagai dua orang yang sudah belajar dari luka masing-masing.",
-"Aku menghargai keputusan kamu... walaupun aku tahu, pasti ada alasan yang tidak pernah benar-benar kamu ceritakan.",
-"Setidaknya... kamu pernah jadi warna di antara hitam putih perjalanan hidupku.",
-"Aku senang pernah mengenalmu... bahkan untuk hal-hal kecil yang mungkin buatmu biasa saja, tapi buatku itu berarti.",
-"Aku berhenti di hari ketiga ini... bukan karena aku sudah tidak peduli, tapi karena aku lelah berperang dengan pikiranku sendiri.",
-"Kisah ini lucu ya... singkat, tapi cukup membekas sampai aku pun sulit menjelaskannya.",
-"Kalau suatu hari ketidaksengajaan itu terjadi lagi... aku masih akan senang.",
-"Bahkan aku akan tetap menerima kamu... dengan segala keadaanmu, tanpa banyak tanya."
+"Kalau waktunya tiba, aku harap masih ada kesempatan untuk kita kembali...",
+"Aku menghargai keputusan kamu... walaupun aku tahu, ada hal yang tidak pernah kamu ceritakan.",
+"Kamu pernah jadi warna... di antara hitam putih hidupku.",
+"Aku senang pernah mengenalmu...",
+"Aku berhenti... bukan karena aku sudah tidak peduli.",
+"Tapi karena aku lelah... melawan pikiranku sendiri.",
+"Kisah ini singkat... tapi cukup membekas.",
+"Kalau kita dipertemukan lagi secara tidak sengaja...",
+"Aku masih akan memilih kamu."
 ];
 
 let started = false;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function typeText(text) {
+  textEl.innerHTML = "";
+  for (let i = 0; i < text.length; i++) {
+    textEl.innerHTML += text[i];
+
+    // glitch random
+    if (Math.random() < 0.05) {
+      textEl.classList.add("glitch");
+      setTimeout(() => textEl.classList.remove("glitch"), 100);
+    }
+
+    await sleep(40);
+  }
+}
 
 async function start() {
   if (started) return;
@@ -155,60 +190,58 @@ async function start() {
   music.volume = 0;
   music.play();
 
+  // fade in music
   let vol = 0;
   let fade = setInterval(() => {
     if (vol < 0.4) {
-      vol += 0.02;
+      vol += 0.01;
       music.volume = vol;
-    } else {
-      clearInterval(fade);
-    }
+    } else clearInterval(fade);
   }, 200);
 
-  document.querySelector(".bg").style.filter = "blur(3px) brightness(0.7)";
+  // background clear pelan
+  let blur = 12;
+  let blurAnim = setInterval(() => {
+    if (blur > 3) {
+      blur -= 0.2;
+      document.querySelector(".bg").style.filter = `blur(${blur}px) brightness(0.6)`;
+    } else clearInterval(blurAnim);
+  }, 200);
 
   for (let p of paragraphs) {
-    textEl.innerHTML = p;
-    textEl.classList.add("fade-in");
-
-    await new Promise(r => setTimeout(r, 4000));
-
-    textEl.classList.remove("fade-in");
-    await new Promise(r => setTimeout(r, 1000));
+    await typeText(p);
+    await sleep(2500);
+    textEl.innerHTML = "";
   }
 
-  textEl.innerHTML = "Sesibuk apapun kamu... jangan lupa jaga kesehatan ya.<br><br>Karena di dunia ini, yang paling sering kita anggap biasa... justru yang paling berharga.";
+  await typeText("Sesibuk apapun kamu... jangan lupa jaga kesehatan ya.");
 
-  textEl.classList.add("fade-in");
+  await sleep(3000);
 
-  await new Promise(r => setTimeout(r, 5000));
+  textEl.innerHTML = "";
 
-  textEl.classList.remove("fade-in");
-
-  await new Promise(r => setTimeout(r, 2000));
+  await sleep(1000);
 
   endingEl.innerHTML = `
   Thank you for everything.<br><br>
   From Fadlian,<br>
   March 18, 2026
   `;
-
   endingEl.style.opacity = 1;
 
-  await new Promise(r => setTimeout(r, 5000));
+  await sleep(6000);
 
   endingEl.style.opacity = 0;
 
-  await new Promise(r => setTimeout(r, 3000));
+  await sleep(3000);
 
   document.getElementById("blackout").style.opacity = 1;
 
+  // fade out music
   let fadeOut = setInterval(() => {
     if (music.volume > 0.02) {
       music.volume -= 0.01;
-    } else {
-      clearInterval(fadeOut);
-    }
+    } else clearInterval(fadeOut);
   }, 200);
 }
 </script>
