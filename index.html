@@ -6,12 +6,11 @@
 <title>For You</title>
 
 <style>
-* {margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+* {margin:0;padding:0;box-sizing:border-box;font-family:Georgia;}
 
 body,html{
   width:100%;height:100%;
   overflow:hidden;
-  background:black;
   color:white;
 }
 
@@ -20,11 +19,11 @@ body,html{
   position:fixed;
   width:100%;height:100%;
   background:url('bg.jpg') center/cover no-repeat;
-  filter:blur(10px) brightness(0.5);
+  filter:blur(8px) brightness(0.5);
   z-index:0;
 }
 
-/* Overlay */
+/* overlay */
 .overlay{
   position:fixed;
   width:100%;height:100%;
@@ -32,28 +31,24 @@ body,html{
   z-index:1;
 }
 
-/* CONTENT */
+/* TEXT CONTAINER */
 .content{
   position:relative;
   z-index:2;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100%;
-  text-align:center;
+  width:90%;
+  max-width:700px;
+  max-height:80vh;
+  overflow-y:auto;
+  margin:auto;
   padding:20px;
-}
-
-.text{
-  max-width:600px;
-  font-size:18px;
+  text-align:center;
   line-height:1.8;
 }
 
 /* BUTTON */
 button{
   position:absolute;
-  top:45%;
+  top:40%;
   left:50%;
   transform:translate(-50%,-50%);
   padding:15px 30px;
@@ -67,7 +62,7 @@ button{
 /* CHAT */
 .chat{
   position:absolute;
-  bottom:20px;
+  bottom:0;
   width:100%;
   padding:15px;
   display:none;
@@ -75,10 +70,9 @@ button{
 
 .bubble{
   max-width:70%;
-  padding:10px 14px;
+  padding:10px;
   border-radius:10px;
   margin:8px;
-  font-size:14px;
 }
 
 .me{
@@ -90,13 +84,6 @@ button{
 .status{
   font-size:10px;
   opacity:0.6;
-  margin-top:2px;
-}
-
-.typing{
-  font-size:12px;
-  opacity:0.7;
-  margin-left:10px;
 }
 
 /* BLACKOUT */
@@ -108,7 +95,6 @@ button{
   z-index:10;
   transition:4s;
 }
-
 </style>
 </head>
 
@@ -117,117 +103,109 @@ button{
 <div class="bg"></div>
 <div class="overlay"></div>
 
-<div class="content">
-  <div class="text" id="text"></div>
-</div>
+<div class="content" id="text"></div>
 
 <button onclick="start()" ontouchstart="start()">Klik pelan ya...</button>
 
 <div class="chat" id="chat"></div>
 
-<audio id="music" loop preload="auto">
+<audio id="music" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <div id="blackout"></div>
 
 <script>
-const textEl = document.getElementById("text");
-const chatEl = document.getElementById("chat");
+const textEl=document.getElementById("text");
+const chatEl=document.getElementById("chat");
 
 let started=false;
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function start(){
-  if(started) return;
-  started=true;
+if(started)return;
+started=true;
 
-  document.querySelector("button").style.display="none";
+document.querySelector("button").style.display="none";
 
-  const music=document.getElementById("music");
-  try{
-    await music.play();
-  }catch(e){
-    console.log("Autoplay blocked, retry...");
-  }
+const music=document.getElementById("music");
+music.volume=0;
+music.play();
 
-  music.volume=0;
+let vol=0;
+let fade=setInterval(()=>{
+if(vol<0.4){
+vol+=0.02;
+music.volume=vol;
+}else clearInterval(fade);
+},200);
 
-  let vol=0;
-  let fade=setInterval(()=>{
-    if(vol<0.4){
-      vol+=0.02;
-      music.volume=vol;
-    }else clearInterval(fade);
-  },200);
+// TEKS FULL
+textEl.innerHTML=`
+aku harap kita asing untuk saling memperbaiki diri.
+jika waktunya tiba aku harap ada kesempatan buat bersama,
+aku hargai keputusan kamu walau aku tau sebab pastinya
+setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku,
 
-  // TEKS AWAL
-  const intro=[
-    "Aku harap kita bisa jadi asing...",
-    "Bukan karena kita gagal...",
-    "Tapi karena kita butuh waktu memperbaiki diri masing-masing..."
-  ];
+senang mengenal mu
+senang pernah dilibatkan dalam hal kecil dihidup kamu,
 
-  for(let t of intro){
-    textEl.innerHTML=t;
-    await sleep(3000);
-  }
+aku bakal berhenti di hari ketiga ini
+karena aku lelah berkelahi sama isi pikiranku,
 
-  textEl.innerHTML="";
-  await sleep(1000);
+kisah ini lucu tapi ya cukup membekas,
 
-  // MASUK CHAT MODE
-  chatEl.style.display="block";
+jika ketidaksengajaan yang memperkenalkan kita terjadi lagi
+aku masih dan akan sangat senang
+bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.
 
-  async function send(msg){
-    let div=document.createElement("div");
-    div.className="bubble me";
-    div.innerHTML=msg + "<div class='status'>✓✓</div>";
-    chatEl.appendChild(div);
-    chatEl.scrollTop=chatEl.scrollHeight;
-    await sleep(2000);
-  }
+sesibuk apapun jangan lupa sama kesehatan kamu ya
+karena rezeki yang gak pernah putus diberikan itu kesehatan,
 
-  async function typing(){
-    let t=document.createElement("div");
-    t.className="typing";
-    t.innerText="typing...";
-    chatEl.appendChild(t);
-    await sleep(3000);
-    t.remove();
-  }
+kamu sedang survive sendirian
+kalau sampai sakit itu memperburuk keadaan,
 
-  await send("Kamu masih inget aku?");
-  await send("Atau aku cuma fase?");
-  await send("Gapapa sih kalau iya...");
-  
-  await typing();
+jangan pernah berhenti jadi orang baik
+walau sebatas niat ataupun sudah tereksekusi.
 
-  await send("Aku cuma pengen jujur sekali ini aja...");
-  await send("Aku masih mikirin kamu.");
+<br><br><i>Thank you for everything.</i>
+<br><br><i>From Fadlian, March 18, 2026</i>
+`;
 
-  await typing();
+await sleep(10000);
 
-  await send("Tapi aku juga sadar...");
-  await send("Gak semua yang kita mau harus kita miliki 🙂");
+// MASUK CHAT
+chatEl.style.display="block";
 
-  await sleep(3000);
+async function send(msg){
+let div=document.createElement("div");
+div.className="bubble me";
+div.innerHTML=msg+"<div class='status'>✓✓</div>";
+chatEl.appendChild(div);
+await sleep(2500);
+}
 
-  // LAST HIT
-  await send("Jadi... aku mundur ya.");
+await send("Kamu masih inget aku?");
+await send("Atau aku cuma fase?");
+await send("Gapapa sih kalau iya...");
+await send("Aku masih mikirin kamu.");
+await send("Tapi aku juga sadar...");
+await send("Gak semua yang kita mau harus kita miliki 🙂");
+await send("Jadi... aku mundur ya.");
 
-  await sleep(4000);
+await sleep(4000);
 
-  // BLACKOUT
-  document.getElementById("blackout").style.opacity=1;
+// BLACKOUT
+document.getElementById("blackout").style.opacity=1;
 
-  // fade music
-  let fadeOut=setInterval(()=>{
-    if(music.volume>0.02){
-      music.volume-=0.01;
-    }else clearInterval(fadeOut);
-  },200);
+// MUSIC FADE
+let fadeOut=setInterval(()=>{
+if(music.volume>0.02){
+music.volume-=0.01;
+}else clearInterval(fadeOut);
+},200);
+
 }
 </script>
 
