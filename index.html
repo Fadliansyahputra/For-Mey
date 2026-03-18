@@ -6,59 +6,77 @@
 <title>For You</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
 
 body,html{
-width:100%;height:100%;
-overflow:hidden;
-color:white;
-background:black;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  color:white;
 }
 
+/* BACKGROUND */
 .bg{
   position:fixed;
-  width:100%;height:100%;
+  width:100%;
+  height:100%;
   background:url('bg.jpg') center/cover no-repeat;
-  filter:blur(6px) brightness(0.5);
+  filter: blur(8px) brightness(0.5);
   z-index:0;
-  pointer-events:none; /* 🔥 TAMBAH INI */
 }
 
+/* OVERLAY */
 .overlay{
   position:fixed;
-  width:100%;height:100%;
+  width:100%;
+  height:100%;
   background:rgba(0,0,0,0.6);
   z-index:1;
-  pointer-events:none; /* 🔥 TAMBAH INI */
 }
 
+/* PARTICLE */
 .particle{
   position:fixed;
-  width:3px;height:3px;
+  width:3px;
+  height:3px;
   background:white;
   opacity:0.3;
   border-radius:50%;
-  animation:float 10s linear infinite;
-  pointer-events:none; /* 🔥 TAMBAH INI */
+  animation: float 10s linear infinite;
 }
 
-/* TEXT */
+@keyframes float{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-10vh);}
+}
+
+/* CONTENT */
 .content{
-position:relative;
-z-index:2;
-width:90%;
-max-width:700px;
-max-height:80vh;
-overflow-y:auto;
-margin:auto;
-padding:20px;
-line-height:1.8;
-white-space:pre-line;
+  position:relative;
+  z-index:2;
+  width:90%;
+  max-width:700px;
+  max-height:80vh;
+  overflow-y:auto;
+  margin:auto;
+  top:50%;
+  transform:translateY(-50%);
+  padding:20px;
+  line-height:1.8;
+  white-space:pre-line;
+  opacity:0;
+  transition:1s;
 }
 
+/* BUTTON */
 button{
   position:absolute;
-  top:45%;
+  top:50%;
   left:50%;
   transform:translate(-50%,-50%);
   padding:15px 30px;
@@ -66,51 +84,36 @@ button{
   border-radius:30px;
   background:white;
   color:black;
-  z-index:9999; /* 🔥 WAJIB */
+  z-index:9999;
   cursor:pointer;
+  font-size:16px;
 }
 
 /* CHAT */
 .chat{
-position:absolute;
-bottom:0;
-width:100%;
-padding:15px;
-display:none;
+  position:fixed;
+  bottom:10px;
+  width:100%;
+  padding:10px;
+  display:none;
+  z-index:3;
 }
 
 .bubble{
-max-width:70%;
-padding:10px;
-border-radius:10px;
-margin:8px;
+  max-width:70%;
+  padding:10px;
+  border-radius:15px;
+  margin:5px;
+  font-size:14px;
 }
 
 .me{
-background:#DCF8C6;
-color:black;
-margin-left:auto;
+  background:#075e54;
+  margin-left:auto;
 }
 
-.status{
-font-size:10px;
-opacity:0.6;
-}
-
-.typing{
-font-size:12px;
-opacity:0.6;
-margin-left:10px;
-}
-
-/* BLACKOUT */
-#blackout{
-position:fixed;
-width:100%;height:100%;
-background:black;
-opacity:0;
-z-index:10;
-transition:5s;
+.you{
+  background:#333;
 }
 </style>
 </head>
@@ -120,142 +123,75 @@ transition:5s;
 <div class="bg"></div>
 <div class="overlay"></div>
 
+<button onclick="start()">Klik pelan ya...</button>
+
 <div class="content" id="text"></div>
 
-<button onclick="start()" ontouchstart="start()">Klik pelan ya...</button>
-
-<div class="chat" id="chat"></div>
+<div class="chat" id="chat">
+  <div class="bubble me">aku kangen...</div>
+  <div class="bubble you">...</div>
+  <div class="bubble me">yaudah</div>
+</div>
 
 <audio id="music" loop>
-<source src="music.mp3" type="audio/mpeg">
+  <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<div id="blackout"></div>
-
 <script>
-const textEl=document.getElementById("text");
-const chatEl=document.getElementById("chat");
-
-let started=false;
-
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-// PARTICLES GENERATOR
-for(let i=0;i<40;i++){
-let p=document.createElement("div");
-p.className="particle";
-p.style.left=Math.random()*100+"%";
-p.style.animationDuration=(5+Math.random()*10)+"s";
-document.body.appendChild(p);
-}
-
-// TYPEWRITER
-async function typeText(text){
-textEl.innerHTML="";
-for(let i=0;i<text.length;i++){
-textEl.innerHTML+=text[i];
-await sleep(25);
-}
-}
-
-async function start(){
-if(started)return;
-started=true;
-
-document.querySelector("button").style.display="none";
-
-const music=document.getElementById("music");
-music.volume=0;
-music.play();
-
-let vol=0;
-let fade=setInterval(()=>{
-if(vol<0.4){
-vol+=0.02;
-music.volume=vol;
-}else clearInterval(fade);
-},200);
-
-// TEKS FULL (TYPEWRITER)
-await typeText(`aku harap kita asing untuk saling memperbaiki diri.
+const text = `aku harap kita asing untuk saling memperbaiki diri.
 jika waktunya tiba aku harap ada kesempatan buat bersama,
 aku hargai keputusan kamu walau aku tau sebab pastinya
 setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku,
-
-senang mengenal mu
-senang pernah dilibatkan dalam hal kecil dihidup kamu,
-
-aku bakal berhenti di hari ketiga ini
-karena aku lelah berkelahi sama isi pikiranku,
-
+senang mengenal mu senang pernah dilibatkan dalam hal kecil dihidup kamu,
+aku bakal berhenti di hari ketiga ini karena aku lelah berkelahi sama isi pikiranku,
 kisah ini lucu tapi ya cukup membekas,
-
 jika ketidaksengajaan yang memperkenalkan kita terjadi lagi
-aku masih dan akan sangat senang
-bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.
+aku masih dan akan sangat senang bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.
 
 sesibuk apapun jangan lupa sama kesehatan kamu ya
 karena rezeki yang gak pernah putus diberikan itu kesehatan,
+kamu sedang survive sendirian kalau sampai sakit itu memperburuk keadaan,
+jangan pernah berhenti jadi orang baik walau sebatas niat ataupun sudah tereksekusi.
 
-kamu sedang survive sendirian
-kalau sampai sakit itu memperburuk keadaan,
+Thank you for everything.
 
-jangan pernah berhenti jadi orang baik
-walau sebatas niat ataupun sudah tereksekusi.
+From Fadlian, March 18, 2026`;
 
-\n\nThank you for everything.
-\n\nFrom Fadlian, March 18, 2026`);
+function start(){
+  const btn = document.querySelector("button");
+  btn.style.display="none";
 
-await sleep(4000);
+  const music = document.getElementById("music");
+  music.volume = 0.4;
+  music.play().catch(()=>{});
 
-// CHAT MODE
-chatEl.style.display="block";
+  typeText();
 
-async function send(msg,centang="✓✓"){
-let div=document.createElement("div");
-div.className="bubble me";
-div.innerHTML=msg+"<div class='status'>"+centang+"</div>";
-chatEl.appendChild(div);
-await sleep(2500);
+  document.getElementById("text").style.opacity=1;
+
+  setTimeout(()=>{
+    document.getElementById("chat").style.display="block";
+  },15000);
 }
 
-async function typing(){
-let t=document.createElement("div");
-t.className="typing";
-t.innerText="typing...";
-chatEl.appendChild(t);
-await sleep(3000);
-t.remove();
+/* TYPING EFFECT */
+let i = 0;
+function typeText(){
+  const el = document.getElementById("text");
+  if(i < text.length){
+    el.innerHTML += text.charAt(i);
+    i++;
+    setTimeout(typeText, 25);
+  }
 }
 
-// CHAT FLOW (EMOTIONAL ATTACK)
-await send("Kamu masih inget aku?");
-await send("Atau aku cuma fase?");
-await send("Gapapa sih kalau iya...");
-
-await typing();
-
-await send("Aku masih mikirin kamu.");
-await send("Tapi aku juga sadar...");
-await send("Gak semua yang kita mau harus kita miliki 🙂");
-
-await typing();
-
-// FINAL HIT
-await send("Jadi... aku mundur ya.", "✓"); // centang 1 💀
-
-await sleep(4000);
-
-// BLACKOUT
-document.getElementById("blackout").style.opacity=1;
-
-// MUSIC FADE OUT
-let fadeOut=setInterval(()=>{
-if(music.volume>0.02){
-music.volume-=0.01;
-}else clearInterval(fadeOut);
-},200);
-
+/* PARTICLES AUTO */
+for(let i=0;i<40;i++){
+  let p = document.createElement("div");
+  p.className="particle";
+  p.style.left=Math.random()*100+"%";
+  p.style.animationDuration=(5+Math.random()*5)+"s";
+  document.body.appendChild(p);
 }
 </script>
 
