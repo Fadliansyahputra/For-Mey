@@ -6,71 +6,61 @@
 <title>For You</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 
 body,html{
   width:100%;
   height:100%;
   overflow:hidden;
+  background:black;
   color:white;
 }
 
-/* BACKGROUND */
+/* BG */
 .bg{
   position:fixed;
   width:100%;
   height:100%;
   background:url('bg.jpg') center/cover no-repeat;
-  filter: blur(8px) brightness(0.5);
+  filter:blur(10px) brightness(0.4);
   z-index:0;
 }
 
-/* OVERLAY */
 .overlay{
   position:fixed;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,0.7);
   z-index:1;
 }
 
-/* PARTICLE */
-.particle{
+/* hujan */
+.rain{
   position:fixed;
-  width:3px;
-  height:3px;
-  background:white;
-  opacity:0.3;
-  border-radius:50%;
-  animation: float 10s linear infinite;
+  width:2px;
+  height:15px;
+  background:rgba(255,255,255,0.2);
+  animation:rain 0.8s linear infinite;
+}
+@keyframes rain{
+  from{transform:translateY(-10vh);}
+  to{transform:translateY(100vh);}
 }
 
-@keyframes float{
-  from{transform:translateY(100vh);}
-  to{transform:translateY(-10vh);}
-}
-
-/* CONTENT */
+/* TEXT */
 .content{
-  position:relative;
+  position:absolute;
   z-index:2;
   width:90%;
   max-width:700px;
-  max-height:80vh;
-  overflow-y:auto;
-  margin:auto;
+  left:50%;
   top:50%;
-  transform:translateY(-50%);
-  padding:20px;
+  transform:translate(-50%,-50%);
   line-height:1.8;
-  white-space:pre-line;
+  text-align:left;
   opacity:0;
   transition:1s;
+  white-space:pre-line;
 }
 
 /* BUTTON */
@@ -86,19 +76,17 @@ button{
   color:black;
   z-index:9999;
   cursor:pointer;
-  font-size:16px;
 }
 
 /* CHAT */
 .chat{
   position:fixed;
-  bottom:10px;
+  bottom:0;
   width:100%;
   padding:10px;
   display:none;
   z-index:3;
 }
-
 .bubble{
   max-width:70%;
   padding:10px;
@@ -106,14 +94,24 @@ button{
   margin:5px;
   font-size:14px;
 }
+.me{background:#075e54;margin-left:auto;}
+.you{background:#333;}
 
-.me{
-  background:#075e54;
-  margin-left:auto;
+.typing{
+  font-size:12px;
+  opacity:0.6;
+  margin-left:10px;
 }
 
-.you{
-  background:#333;
+/* END */
+.end{
+  position:absolute;
+  bottom:40px;
+  width:100%;
+  text-align:center;
+  opacity:0;
+  color:#aaa;
+  transition:2s;
 }
 </style>
 </head>
@@ -126,72 +124,160 @@ button{
 <button onclick="start()">Klik pelan ya...</button>
 
 <div class="content" id="text"></div>
-
-<div class="chat" id="chat">
-  <div class="bubble me">aku kangen...</div>
-  <div class="bubble you">...</div>
-  <div class="bubble me">yaudah</div>
-</div>
+<div class="chat" id="chat"></div>
+<div class="end" id="end"></div>
 
 <audio id="music" loop>
-  <source src="music.mp3" type="audio/mpeg">
+  <source src="music.mp3">
+</audio>
+
+<audio id="rainSound" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b1a63.mp3">
+</audio>
+
+<audio id="notif">
+  <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_270fa4d97b.mp3">
 </audio>
 
 <script>
-const text = `aku harap kita asing untuk saling memperbaiki diri.
+const paragraphs = [
+`aku harap kita asing untuk saling memperbaiki diri.
 jika waktunya tiba aku harap ada kesempatan buat bersama,
-aku hargai keputusan kamu walau aku tau sebab pastinya
-setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku,
-senang mengenal mu senang pernah dilibatkan dalam hal kecil dihidup kamu,
-aku bakal berhenti di hari ketiga ini karena aku lelah berkelahi sama isi pikiranku,
-kisah ini lucu tapi ya cukup membekas,
-jika ketidaksengajaan yang memperkenalkan kita terjadi lagi
-aku masih dan akan sangat senang bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.
+aku hargai keputusan kamu walau aku tau sebab pastinya`,
 
-sesibuk apapun jangan lupa sama kesehatan kamu ya
+`setidaknya kamu pernah jadi warna di antara hitam putih perjalanan hidupku,
+senang mengenal mu senang pernah dilibatkan dalam hal kecil dihidup kamu`,
+
+`aku bakal berhenti di hari ketiga ini karena aku lelah berkelahi sama isi pikiranku,
+kisah ini lucu tapi ya cukup membekas`,
+
+`jika ketidaksengajaan yang memperkenalkan kita terjadi lagi
+aku masih dan akan sangat senang bahkan aku siap menerima kehadiran kamu dengan segala kondisi kamu.`,
+
+`sesibuk apapun jangan lupa sama kesehatan kamu ya
 karena rezeki yang gak pernah putus diberikan itu kesehatan,
-kamu sedang survive sendirian kalau sampai sakit itu memperburuk keadaan,
-jangan pernah berhenti jadi orang baik walau sebatas niat ataupun sudah tereksekusi.
+kamu sedang survive sendirian kalau sampai sakit itu memperburuk keadaan`,
 
-Thank you for everything.
+`jangan pernah berhenti jadi orang baik walau sebatas niat ataupun sudah tereksekusi.`,
 
-From Fadlian, March 18, 2026`;
+`Thank you for everything.
+
+From Fadlian, March 18, 2026`
+];
 
 function start(){
-  const btn = document.querySelector("button");
-  btn.style.display="none";
+  document.querySelector("button").style.display="none";
 
-  const music = document.getElementById("music");
-  music.volume = 0.4;
+  const music=document.getElementById("music");
+  const rain=document.getElementById("rainSound");
+
+  music.volume=0.4;
+  rain.volume=0.2;
+
   music.play().catch(()=>{});
-
-  typeText();
+  rain.play().catch(()=>{});
 
   document.getElementById("text").style.opacity=1;
 
-  setTimeout(()=>{
-    document.getElementById("chat").style.display="block";
-  },15000);
+  showParagraph(0);
 }
 
-/* TYPING EFFECT */
-let i = 0;
-function typeText(){
-  const el = document.getElementById("text");
-  if(i < text.length){
-    el.innerHTML += text.charAt(i);
-    i++;
-    setTimeout(typeText, 25);
+/* PARAGRAPH FLOW */
+function showParagraph(index){
+  if(index >= paragraphs.length){
+    setTimeout(()=>{
+      document.getElementById("text").style.opacity=0;
+      setTimeout(chatFlow,2000);
+    },2000);
+    return;
+  }
+
+  let el=document.getElementById("text");
+  el.innerHTML="";
+  typeText(paragraphs[index],0,()=>{
+    setTimeout(()=>showParagraph(index+1),2000);
+  });
+}
+
+/* typing */
+function typeText(text,i,done){
+  let el=document.getElementById("text");
+  if(i<text.length){
+    el.innerHTML+=text.charAt(i);
+    setTimeout(()=>typeText(text,i+1,done),30);
+  }else{
+    done();
   }
 }
 
-/* PARTICLES AUTO */
-for(let i=0;i<40;i++){
-  let p = document.createElement("div");
-  p.className="particle";
-  p.style.left=Math.random()*100+"%";
-  p.style.animationDuration=(5+Math.random()*5)+"s";
-  document.body.appendChild(p);
+/* CHAT */
+function chatFlow(){
+  const chat=document.getElementById("chat");
+  const notif=document.getElementById("notif");
+  chat.style.display="block";
+
+  function addMsg(txt,cls){
+    let div=document.createElement("div");
+    div.className="bubble "+cls;
+    div.innerText=txt;
+    chat.appendChild(div);
+  }
+
+  function typing(){
+    let t=document.createElement("div");
+    t.className="typing";
+    t.id="typing";
+    t.innerText="sedang mengetik...";
+    chat.appendChild(t);
+  }
+
+  function stopTyping(){
+    let t=document.getElementById("typing");
+    if(t) t.remove();
+  }
+
+  addMsg("aku kangen...", "me");
+
+  setTimeout(()=>{
+    notif.play();
+    typing();
+  },2000);
+
+  setTimeout(()=>{
+    stopTyping(); // 💀 hilang
+  },6000);
+
+  setTimeout(()=>{
+    addMsg("yaudah", "me");
+  },8000);
+
+  setTimeout(ending,12000);
+}
+
+/* END */
+function ending(){
+  const end=document.getElementById("end");
+
+  end.innerText="last seen recently...";
+  end.style.opacity=1;
+
+  setTimeout(()=>{end.innerText="online...";},4000);
+  setTimeout(()=>{end.innerText="typing...";},7000);
+  setTimeout(()=>{end.innerText="...";},10000);
+
+  setTimeout(()=>{
+    document.body.style.transition="3s";
+    document.body.style.filter="blur(10px) brightness(0)";
+  },12000);
+}
+
+/* hujan */
+for(let i=0;i<100;i++){
+  let r=document.createElement("div");
+  r.className="rain";
+  r.style.left=Math.random()*100+"%";
+  r.style.animationDuration=(0.5+Math.random())+"s";
+  document.body.appendChild(r);
 }
 </script>
 
